@@ -1,10 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from .models import Blog
+from .models import Blog, Comment
 from .forms import NewBlog, CommentForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import auth
+
+@login_required(login_url='/login/')
+def del_comment(request, pk):
+    print("hello")
+    # comment = get_object_or_404(Comment, pk=pk)
+    # comment.delete()
+    return redirect('home')
 
 
 def add_comment(request, pk):
@@ -19,6 +26,24 @@ def add_comment(request, pk):
     else:
         form = CommentForm()
     return render(request, 'funccrud/add_comment.html', {'form': form})
+
+def edit_comment(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+    if request.method == "POST":
+        form = CommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            comment.save()
+            return redirect('home')
+    else:
+        form = CommentForm(instance=comment)
+    return render(request, 'funccrud/add_comment.html', {'form': form})
+
+
+@login_required(login_url='/login/')
+def delete(request, pk):
+    comment = get_object_or_404(Comment, pk = pk)
+    comment.delete()
+    return redirect('home')
 
 def welcome(request):
     return render(request, 'funccrud/index.html')
@@ -49,8 +74,10 @@ def logout(request):
     return redirect('home')
 
 def read(request):
-    blogs = Blog.objects.all()
+    blogs = Blog.objects.all().order_by('-created_date', 'title')
     return render(request, 'funccrud/funccrud.html', {'blogs':blogs})
+
+
 
 @login_required(login_url='/login/')
 def create(request):
@@ -77,6 +104,12 @@ def update(request, pk):
     else:
        form = NewBlog(instance=blog) 
     return render(request, 'funccrud/new.html', {'form':form})
+
+@login_required(login_url='/login/')
+def del_comment(request, pk):
+    blog = get_object_or_404(Blog, pk = pk)
+    blog.delete()
+    return redirect('home')
 
 @login_required(login_url='/login/')
 def delete(request, pk):

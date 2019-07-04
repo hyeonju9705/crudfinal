@@ -1,10 +1,17 @@
 from django.db import models
 from django.utils import timezone
 
+category_select = (
+    ('일반', '일반'),
+    ('공지', '공지'),
+    ('과제', '과제'),
+)
+
 class Blog(models.Model):
     author = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     body = models.TextField()
+    category = models.CharField(max_length=20, choices=category_select, default='일반')
     created_date = models.DateTimeField(default=timezone.now)
     published_date = models.DateTimeField(blank=True, null=True)
 

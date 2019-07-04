@@ -13,7 +13,7 @@
     {% endif %}
     {% for blog in blogs %}
         <h2>{{blog.title}}</h2>
-        <h3>{{blog.author}}</h3>
+        <h3>{{blog.category}} ㅣ {{blog.author}} ㅣ {{blog.created_date}}</h3>
         <h5>{{blog.created_date}}</h5>
         <p>{{blog.body}}</p>
         <p>댓글 수 : {{blog.comments.count}}</p>
@@ -22,6 +22,8 @@
         <hr>
         <a  href="{% url 'add_comment' blog.id %}">댓글 달기</a>
         {% for comment in blog.comments.all %}
+        <a href="{% url 'edit_comment' comment.id %}">수정</a>
+        <a href="{% url 'del_comment' comment.id %}">삭제</a>
             <div class="comment">
                 <div class="date">{{ comment.created_date }} {{ comment.author }}</div>
                 <p>{{ comment.text|linebreaks }}</p>
@@ -36,7 +38,7 @@
 </body>
 
 <script>
-    $('#delete').click(function(){
+    $('.delete').click(function(){
         // alert('sfd');
         if (confirm('Are you sure?') == true) {
 
