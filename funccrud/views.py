@@ -6,6 +6,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import auth
 
+# 페이지네이션을 위해서 추가
+from django.core.paginator import Paginator
+
 @login_required(login_url='/login/')
 def del_comment(request, pk):
     print("hello")
@@ -74,8 +77,21 @@ def logout(request):
     return redirect('home')
 
 def read(request):
-    blogs = Blog.objects.all().order_by('-created_date', 'title')
-    return render(request, 'funccrud/funccrud.html', {'blogs':blogs})
+    # blogs = Blog.objects.all().order_by('-created_date', 'title')
+
+    # 기존 플로그 조회 내용을 pagination용으로 변경 
+    
+    blogs = Blog.objects
+    #블로그 모든 글들을 대상으로
+    blog_list=Blog.objects.all().order_by('-created_date' , 'title')
+    #블로그 객체 세 개를 한 페이지로 자르기
+    paginator = Paginator(blog_list,3)
+    #request된 페이지가 뭔지를 알아내고 ( request페이지를 변수에 담아냄 )
+    page = request.GET.get('page')
+    #request된 페이지를 얻어온 뒤 return 해 준다
+    posts = paginator.get_page(page)
+
+    return render(request, 'funccrud/funccrud.html', {'blogs':blogs , 'posts' : posts})
 
 
 
@@ -105,14 +121,14 @@ def update(request, pk):
        form = NewBlog(instance=blog) 
     return render(request, 'funccrud/new.html', {'form':form})
 
-@login_required(login_url='/login/')
-def del_comment(request, pk):
-    blog = get_object_or_404(Blog, pk = pk)
-    blog.delete()
-    return redirect('home')
+# @login_required(login_url='/login/')
+# def del_comment(request, pk):
+#     blog = get_object_or_404(Blog, pk = pk)
+#     blog.delete()
+#     return redirect('home')
 
-@login_required(login_url='/login/')
-def delete(request, pk):
-    blog = get_object_or_404(Blog, pk = pk)
-    blog.delete()
-    return redirect('home')
+# @login_required(login_url='/login/')
+# def delete(request, pk):
+#     blog = get_object_or_404(Blog, pk = pk)
+#     blog.delete()
+#     return redirect('home')
